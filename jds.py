@@ -37,7 +37,11 @@ class JDS:
             params = plist
 #        print(f":w{command}={params}.\r\n".encode())
         self.serial.write(f":w{command}={params}.\r\n".encode())
-        return self.serial.readline().decode().strip()
+        response = self.serial.readline().decode().strip()
+        if response != ':ok':
+            print("Unexpected Response:", response)
+            print("Sent:", f":w{command}={params}.\r\n".encode())
+        return response
 
     def read(self, command):
 #        print("Read:", f":r{command}=0.\r\n".encode())
