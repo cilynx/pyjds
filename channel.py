@@ -60,3 +60,11 @@ class Channel:
     @amplitude.setter
     def amplitude(self, value):
         self.dds.write(self.dds.AMPLITUDE + self.num, value*1000)
+
+    @property
+    def offset(self):
+        return (int(self.dds.read(self.dds.OFFSET + self.num))-1000)/100
+
+    @offset.setter
+    def offset(self, value):
+        self.dds.write(self.dds.OFFSET + self.num, 1000+(100*value))

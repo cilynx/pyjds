@@ -16,6 +16,7 @@ class JDS:
     WAVEFORM        = 21
     FREQUENCY       = 23
     AMPLITUDE       = 25
+    OFFSET          = 27
     PANEL           = 33
 
     def __init__(self, port="/dev/ttyUSB0"):
