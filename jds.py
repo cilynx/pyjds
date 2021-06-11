@@ -3,29 +3,11 @@ from channel import Channel
 
 class JDS:
 
-    WAVEFORMS = (   "Sine",
-                    "Square",
-                    "Pulse",
-                    "Triangle",
-                    "PartialSine",
-                    "CMOS",
-                    "DC",
-                    "Half-Wave",
-                    "Full-Wave",
-                    "Pos-Ladder",
-                    "Neg-Ladder",
-                    "Noise",
-                    "Exp-Rise",
-                    "Exp-Decay",
-                    "Multi-Tone",
-                    "Sinc",
-                    "Lorenz")
-
     CHANNEL_1       = 0
     CHANNEL_2       = 1
     SYS             = 2
     MEASUREMENT     = 4
-    COUNTING        = 5
+    COUNTER         = 5
     SWEEP_0         = 6
     SWEEP_1         = 7
     PULSE           = 8
@@ -66,7 +48,9 @@ class JDS:
 
     @property
     def panel(self):
-        return self.read(self.PANEL)
+        panels = ("Channel 1 Main", "PANEL_1", "Channel 2 Main", "PANEL_3", "System Settings", "PANEL_5", "PANEL_6", "PANEL_7",
+                  "Measurement", "Counter", "Channel 1 Sweep", "Channel 2 Sweep", "Pulse", "Burst")
+        return panels[int(self.read(self.PANEL))//8]
 
     @panel.setter
     def panel(self, value):

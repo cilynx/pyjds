@@ -3,6 +3,24 @@ class Channel:
         self.dds = dds
         self.num = num
 
+    WAVEFORMS = (   "Sine",
+                    "Square",
+                    "Pulse",
+                    "Triangle",
+                    "PartialSine",
+                    "CMOS",
+                    "DC",
+                    "Half-Wave",
+                    "Full-Wave",
+                    "Pos-Ladder",
+                    "Neg-Ladder",
+                    "Noise",
+                    "Exp-Rise",
+                    "Exp-Decay",
+                    "Multi-Tone",
+                    "Sinc",
+                    "Lorenz")
+
     @property
     def enabled(self):
         statuses = self.dds.read(self.dds.CHANNEL_ENABLE).split(',')
@@ -18,12 +36,12 @@ class Channel:
 
     @property
     def wave(self):
-        return self.dds.WAVEFORMS[int(self.dds.read(self.dds.WAVEFORM + self.num))]
+        return self.WAVEFORMS[int(self.dds.read(self.dds.WAVEFORM + self.num))]
 
     @wave.setter
     def wave(self, value):
         try:
-            self.dds.write(self.dds.WAVEFORM + self.num, self.dds.WAVEFORMS.index(value))
+            self.dds.write(self.dds.WAVEFORM + self.num, self.WAVEFORMS.index(value))
         except:
             self.dds.write(self.dds.WAVEFORM + self.num, int(value))
 
