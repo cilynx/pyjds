@@ -17,6 +17,7 @@ class JDS:
     FREQUENCY       = 23
     AMPLITUDE       = 25
     OFFSET          = 27
+    DUTY            = 29
     PANEL           = 33
 
     def __init__(self, port="/dev/ttyUSB0"):

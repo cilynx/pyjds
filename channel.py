@@ -68,3 +68,11 @@ class Channel:
     @offset.setter
     def offset(self, value):
         self.dds.write(self.dds.OFFSET + self.num, 1000+(100*value))
+
+    @property
+    def duty(self):
+        return int(self.dds.read(self.dds.DUTY + self.num))/10
+
+    @duty.setter
+    def duty(self, value):
+        self.dds.write(self.dds.DUTY + self.num, value*10)
