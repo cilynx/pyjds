@@ -18,6 +18,7 @@ class JDS:
     AMPLITUDE       = 25
     OFFSET          = 27
     DUTY            = 29
+    PHASE           = 31
     PANEL           = 33
 
     def __init__(self, port="/dev/ttyUSB0"):
@@ -61,3 +62,11 @@ class JDS:
     @panel.setter
     def panel(self, value):
         self.write(self.PANEL, value)
+
+    @property
+    def phase(self):
+        return int(self.read(self.PHASE))/10
+
+    @phase.setter
+    def phase(self, value):
+        self.write(self.PHASE, value*10)
