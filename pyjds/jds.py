@@ -1,5 +1,5 @@
 import serial
-from channel import Channel
+from .channel import Channel
 
 class JDS:
 
