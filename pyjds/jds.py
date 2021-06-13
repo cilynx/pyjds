@@ -50,16 +50,16 @@ class JDS:
     PULSE_AMPLITUDE = 48 # Not yet implemented
     BURST_COUNT     = 49 # Not yet implemented
     BURST_MODE      = 50 # Not yet implemented
-    SYS_SOUND_W     = 51 # Not yet implemented
-    SYS_SOUND_R     = 52 # Not yet implemented
-    SYS_BRIGHT_W    = 52 # Not yet implemented
-    SYS_BRIGHT_R    = 53 # Not yet implemented
-    SYS_LANGUAGE_W  = 53 # Not yet implemented
-    SYS_LANGUAGE_R  = 54 # Not yet implemented
-    SYS_SYNC_W      = 54 # Not yet implemented
-    SYS_SYNC_R      = 55 # Not yet implemented
-    SYS_ARB_MAX_W   = 55 # Not yet implemented
-    SYS_ARB_MAX_R   = 56 # Not yet implemented
+    SYS_SOUND_W     = 51
+    SYS_SOUND_R     = 52
+    SYS_BRIGHT_W    = 52
+    SYS_BRIGHT_R    = 53
+    SYS_LANGUAGE_W  = 53
+    SYS_LANGUAGE_R  = 54
+    SYS_SYNC_W      = 54
+    SYS_SYNC_R      = 55
+    SYS_ARB_MAX_W   = 55
+    SYS_ARB_MAX_R   = 56
     #               = 57 # 0
     #               = 58 # 0
     #               = 59 # 0
@@ -196,3 +196,67 @@ class JDS:
     @phase.setter
     def phase(self, value):
         self.write(self.PHASE, value*10)
+
+    @property
+    def model(self):
+        return int(self.read(self.MODEL_NUM))
+
+    @property
+    def serialnum(self):
+        return int(self.read(self.SERIAL_NUM))
+
+    @property
+    def sound(self):
+        return int(self.read(self.SYS_SOUND_R))
+
+    @sound.setter
+    def sound(self, value):
+        if value not in (0,1):
+            raise ValueError("SYS_SOUND can only be set to 0 (Off) or 1 (On)")
+        self.write(self.SYS_SOUND_W, int(value))
+
+    @property
+    def brightness(self):
+        return int(self.read(self.SYS_BRIGHT_R))
+
+    @brightness.setter
+    def brightness(self, value):
+        if value not in range(13):
+            raise ValueError("SYS_BRIGHT can only be set to integers from 0-12")
+        self.write(self.SYS_BRIGHT_W, value)
+
+    @property
+    def language(self):
+        return int(self.read(self.SYS_LANGUAGE_R))
+
+    @language.setter
+    def language(self, value):
+        if value not in (0,1):
+            raise ValueError("SYS_LANGUAGE can only be set to 0 (English) or 1 (Chinese)")
+        self.write(self.SYS_LANGUAGE_W, value)
+
+    @property
+    def sync(self):
+        return eval(self.read(self.SYS_SYNC_R))
+
+    @sync.setter
+    def sync(self, value):
+        try:
+            if len(value) != 5:
+                raise ValueError("SYS_SYNC can only be set to a 5-tuple (Freq, Wave, Ampl, Duty, Offs) with values of 0 (Not-Synchronized) or 1 (Synchronized)")
+            for val in value:
+                if val not in (0, 1):
+                    raise ValueError("SYS_SYNC can only be set to a 5-tuple (Freq, Wave, Ampl, Duty, Offs) with values of 0 (Not-Synchronized) or 1 (Synchronized)")
+            self.write(self.SYS_SYNC_W, tuple(map(int, value)))
+        except:
+            raise ValueError("SYS_SYNC can only be set to a 5-tuple (Freq, Wave, Ampl, Duty, Offs) with values of 0 (Not-Synchronized) or 1 (Synchronized)")
+
+    @property
+    def arb_max(self):
+        return int(self.read(self.SYS_ARB_MAX_R))
+
+    @arb_max.setter
+    def arb_max(self, value):
+        if value not in range(1,61):
+            raise ValueError("SYS_ARB_MAX can only be set to integers from 1-60")
+        self.write(self.SYS_ARB_MAX_W, value)
