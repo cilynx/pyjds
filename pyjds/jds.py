@@ -5,13 +5,6 @@ class JDS:
 
     CHANNEL_1       = 0
     CHANNEL_2       = 1
-    SYS             = 2
-    MEASUREMENT     = 4
-    COUNTER         = 5
-    SWEEP_0         = 6
-    SWEEP_1         = 7
-    PULSE           = 8
-    BURST           = 9
     CHANNEL_ENABLE  = 20
     WAVEFORM        = 21
     FREQUENCY       = 23
@@ -20,6 +13,32 @@ class JDS:
     DUTY            = 29
     PHASE           = 31
     PANEL           = 33
+
+    PANELS_W = ("Channel 1 Main",
+                "Channel 2 Main",
+                "System Settings",
+                None,
+                "Measurement",
+                "Counter",
+                "Channel 1 Sweep",
+                "Channel 2 Sweep",
+                "Pulse",
+                "Burst")
+
+    PANELS_R = ("Channel 1 Main",
+                "PANEL_1",
+                "Channel 2 Main",
+                "PANEL_3",
+                "System Settings",
+                "PANEL_5",
+                "PANEL_6",
+                "PANEL_7",
+                "Measurement",
+                "Counter",
+                "Channel 1 Sweep",
+                "Channel 2 Sweep",
+                "Pulse",
+                "Burst")
 
     def __init__(self, port="/dev/ttyUSB0"):
         self.channels = list()
@@ -55,9 +74,7 @@ class JDS:
 
     @property
     def panel(self):
-        panels = ("Channel 1 Main", "PANEL_1", "Channel 2 Main", "PANEL_3", "System Settings", "PANEL_5", "PANEL_6", "PANEL_7",
-                  "Measurement", "Counter", "Channel 1 Sweep", "Channel 2 Sweep", "Pulse", "Burst")
-        return panels[int(self.read(self.PANEL))//8]
+        return self.PANELS_R[int(self.read(self.PANEL))//8]
 
     @panel.setter
     def panel(self, value):
