@@ -4,26 +4,26 @@ from .channel import Channel
 class JDS:
 
     # Registers
-    MODEL_NUM       = 0  # Not yet implemented
-    SERIAL_NUM      = 1  # Not yet implemented
-    #               = 2  # 29
-    #               = 3  # 32002
-    #               = 4  # 2042
-    #               = 5  # 1024
-    #               = 6  # 78
-    #               = 7  # 1720
-    #               = 8  # 1729
-    #               = 9  # 1727
-    #               = 10 # 2857
-    #               = 11 # 2069
-    #               = 12 # 1037
-    #               = 13 # 80
-    #               = 14 # 1724
-    #               = 15 # 1731
-    #               = 16 # 1730
-    #               = 17 # 2839
-    #               = 18 # 5050
-    #               = 19 # 0
+    MODEL_NUM       = 0  # Read-only.  Writes are ignored by the device.
+    SERIAL_NUM      = 1  # Read-only.  Writes are ignored by the device.
+    #               = 2  # 29 # Read-only.  Writes are ignored by the device.
+    CAL_FREQ        = 3
+    CAL_CH1_LOFS    = 4
+    CAL_CH1_HOFS    = 5
+    CAL_CH1_02V     = 6
+    CAL_CH1_06V     = 7
+    CAL_CH1_60V     = 8
+    CAL_CH1_20V     = 9
+    CAL_CH1_OF_6V   = 10
+    CAL_CH2_LOFS    = 11
+    CAL_CH2_HOFS    = 12
+    CAL_CH2_02V     = 13
+    CAL_CH2_06V     = 14
+    CAL_CH2_60V     = 15
+    CAL_CH2_20V     = 16
+    CAL_CH2_OF_6V   = 17
+    CAL_AM_000V     = 18
+    #               = 19 # 0 # Read-only.  Writes are ignored by the device.
     CHANNEL_ENABLE  = 20
     WAVEFORM        = 21 # and 22
     FREQUENCY       = 23 # and 24
@@ -33,8 +33,8 @@ class JDS:
     PHASE           = 31
     ACTION          = 32 # Not yet implemented
     PANEL           = 33
-    #               = 34 # 0
-    #               = 35 # 0
+    SELECT          = 34 # Not yet implemented
+    #               = 35 # Writable and changes, but don't know why yet
     MEASURE_COUP    = 36 # Not yet implemented
     MEASURE_GATE    = 37 # Not yet implemented
     MEASURE_MODE    = 38 # Not yet implemented
@@ -104,6 +104,22 @@ class JDS:
     #               = 98 # 0
     #               = 99 # 0 # Last register you can read with single read
 
+    SELECT = (  "CH1_CH1", "CH1_CH1_WAVEFORM", "CH1_CH1_FREQUENCY", "CH1_CH1_AMPLITUDE", "CH1_CH1_OFFSET", "CH1_CH1_DUTY", "CH1_CH1_PHASE", "CH1_CH1",
+                "CH1_CH2", "CH1_CH2_WAVEFORM", "CH1_CH2_FREQUENCY", "CH1_CH2_AMPLITUDE", "CH1_CH2_OFFSET", "CH1_CH2_DUTY", "CH1_CH2_PHASE", "CH1_CH2",
+                "CH2_CH1", "CH2_CH1_WAVEFORM", "CH2_CH1_FREQUENCY", "CH2_CH1_AMPLITUDE", "CH2_CH1_OFFSET", "CH2_CH1_DUTY", "CH2_CH1_PHASE", "CH2_CH1",
+                "CH2_CH2", "CH2_CH2_WAVEFORM", "CH2_CH2_FREQUENCY", "CH2_CH2_AMPLITUDE", "CH2_CH2_OFFSET", "CH2_CH2_DUTY", "CH2_CH2_PHASE", "CH2_CH2",
+                "SYS_SAVE_LOAD", "SYS_SOUND", "SYS_BRIGHT", "SYS_LANGUAGE", "SYS_SYNC", "SYS_ARB_MAX", "SYS_RESTORE_DEFAULTS", None,
+                None, None, None, None, None, None, None, None,
+                "CAL_FREQ", "CAL_CH1_LOFS", "CAL_CH1_HOFS", "CAL_CH1_02V", "CAL_CH1_06V", "CAL_CH1_60V", "CAL_CH1_20V", "CAL_CH1_OF_6V",
+                            "CAL_CH2_LOFS", "CAL_CH2_HOFS", "CAL_CH2_02V", "CAL_CH2_06V", "CAL_CH2_60V", "CAL_CH2_20V", "CAL_CH2_OF_6V", "CAL_AM_000V",
+                "MEASURE_MEASURE", "MEASURE_COUP", "MEASURE_GATE", "MEASURE_MODE", None, None, None, None,
+                "MEASURE_COUNTER", "COUNTER_COUP", "COUNTER_CTRL", None, None, None, None, None,
+                "MOD_SF1", "MOD_SF1_START", "MOD_SF1_END", "MOD_SF1_TIME", "MOD_SF1_DIR", "MOD_SF1_MODE", "MOD_SF1_CTRL", None,
+                "MOD_SF2", "MOD_SF2_START", "MOD_SF2_END", "MOD_SF2_TIME", "MOD_SF2_DIR", "MOD_SF2_MODE", "MOD_SF2_CTRL", None,
+                "MOD_PLS", "MOD_PLS_W", "MOD_PLS_T", "MOD_PLS_OFFS", "MOD_PLS_AMPL", "MOD_PLS_CTRL", None, None,
+                "MOD_BST", "MOD_BST_NUM", "MOD_BST_MODE", "MOD_BST_CTRL", None, None # Higher values than this corrupt the display
+                )
+
     PANELS_W = ("Channel 1 Main",
                 "Channel 2 Main",
                 "System Settings",
@@ -141,6 +157,10 @@ class JDS:
         )
 
     def write(self, command="", plist="", debug=False):
+        # Normalize all commands to 2-digit character representations
+        # Single digits get a 0 added to the end by the device
+        # e.g. '1' will be interpreted as '10'.  No bueno.
+        command = f'{int(command):02}'
         self.serial.flushInput()
         self.serial.flushOutput()
         try:
