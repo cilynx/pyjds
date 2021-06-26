@@ -45,6 +45,44 @@ print(channel.enabled)
 # Valid values are:
 (True, False, 1, 0)
 ```
+# channel.wave
+Channel waveform.  Can be set by name or integer index.  Returns name `str` of the current waveform.
+```python
+# Select a sine wave
+channel.wave = 'Sine'
+# or
+channel.wave = 0
+
+# Select the 1st arbitrary waveform
+channel.wave = 'Arbitrary1'
+# or
+channel.wave = 'Arbitrary01'
+# or
+channel.wave = 101
+
+
+# Print the active panel name (`str`)
+print(channel.wave)
+
+# Valid values/indexes are:
+("Sine",
+ "Square",
+ "Pulse",
+ "Triangle",
+ "PartialSine",
+ "CMOS",
+ "DC",
+ "Half-Wave",
+ "Full-Wave",
+ "Pos-Ladder",
+ "Neg-Ladder",
+ "Noise",
+ "Exp-Rise",
+ "Exp-Decay",
+ "Multi-Tone",
+ "Sinc",
+ "Lorenz")
+```
 
 # jds.model
 The device model number...ish.  Generally aligns with the maximum frequency.  Read-only.

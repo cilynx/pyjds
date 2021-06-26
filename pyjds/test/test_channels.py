@@ -60,8 +60,32 @@ class ChannelsTest(TestCase):
                     self.assertEqual(channel.duty, d)
 
     def test_wave(self):
-        for w in (self.jds.channels[0].WAVEFORMS):
+        waveforms = self.jds.channels[0].WAVEFORMS
+        for w in waveforms: # Built-in waveform names
+            for w in (w, w.lower(), w.upper()):
+                with self.subTest(w=w):
+                    for channel in self.jds.channels:
+                        channel.wave = w
+                        self.assertEqual(channel.wave, w.lower())
+        for n in ('Arbitrary1','arbitrary02',"ARBITRARY60"): # Arbitrary wavefrom names
             with self.subTest(w=w):
                 for channel in self.jds.channels:
                     channel.wave = w
-                    self.assertEqual(channel.wave, w)
+                    self.assertEqual(channel.wave.lower().replace('y0','y'), w.lower().replace('y0','y'))
+        for w in range(len(waveforms)): # Built-in waveform indexes
+            with self.subTest(w=w):
+                for channel in self.jds.channels:
+                    channel.wave = w
+                    self.assertEqual(channel.wave, waveforms[w])
+        for w in range(101,161): # Arbitrary waveform indexes
+            with self.subTest(w=w):
+                for channel in self.jds.channels:
+                    channel.wave = w
+                    self.assertEqual(channel.wave, 'Arbitrary' + "{:02d}".format(w-100))
+
+    def test_wave_invalid(self):
+        for w in (None, "", '', 'a', "foo", 'Arbitrary0', "arbitrary61", -1, len(self.jds.channels[0].WAVEFORMS), 100):
+            with self.subTest(w=w):
+                with self.assertRaises(ValueError):
+                    for channel in self.jds.channels:
+                        channel.wave = w

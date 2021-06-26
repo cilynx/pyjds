@@ -3,23 +3,23 @@ class Channel:
         self.dds = dds
         self.num = num
 
-    WAVEFORMS = (   "Sine",
-                    "Square",
-                    "Pulse",
-                    "Triangle",
-                    "PartialSine",
-                    "CMOS",
-                    "DC",
-                    "Half-Wave",
-                    "Full-Wave",
-                    "Pos-Ladder",
-                    "Neg-Ladder",
-                    "Noise",
-                    "Exp-Rise",
-                    "Exp-Decay",
-                    "Multi-Tone",
-                    "Sinc",
-                    "Lorenz")
+    WAVEFORMS = (   "sine",
+                    "square",
+                    "pulse",
+                    "triangle",
+                    "partialsine",
+                    "cmos",
+                    "dc",
+                    "half-wave",
+                    "full-wave",
+                    "pos-ladder",
+                    "neg-ladder",
+                    "noise",
+                    "exp-rise",
+                    "exp-decay",
+                    "multi-tone",
+                    "sinc",
+                    "lorenz")
 
     @property
     def enabled(self):
@@ -29,7 +29,7 @@ class Channel:
     @enabled.setter
     def enabled(self, value):
         if value not in (False,True,'0','1'):
-            raise ValueError("Enable state can only be set to bool (True/False) or int (0/1)")
+            raise ValueError("Channel.enable state can only be set to bool (True/False) or int (0/1)")
         param = [0,0]
         param[self.num] = int(value)
         other_channel = self.dds.channels[not self.num]
@@ -38,14 +38,31 @@ class Channel:
 
     @property
     def wave(self):
-        return self.WAVEFORMS[int(self.dds.read(self.dds.WAVEFORM + self.num))]
+        wave_num = int(self.dds.read(self.dds.WAVEFORM + self.num))
+        if wave_num < len(self.WAVEFORMS):
+            return self.WAVEFORMS[wave_num]
+        else:
+            return 'Arbitrary' + "{:02d}".format(wave_num-100)
 
     @wave.setter
     def wave(self, value):
         try:
-            self.dds.write(self.dds.WAVEFORM + self.num, self.WAVEFORMS.index(value))
+            # Built-in waveform names
+            if isinstance(value, str) and value.lower() in self.WAVEFORMS:
+                self.dds.write(self.dds.WAVEFORM + self.num, self.WAVEFORMS.index(value.lower()))
+            # Arbitrary waveform names
+            elif isinstance(value, str) and value.lower().startswith('arbitrary'):
+                if int(value.lower().replace('arbitrary','')) in range(1,61):
+                    self.dds.write(self.dds.WAVEFORM + self.num, int(value.lower().replace('arbitrary',''))+100)
+                else:
+                    raise ValueError("Channel.wave arbitrary waveform name must be in range(1,61)")
+            # Built-in and arbitrary waveform indexes
+            elif int(value) in tuple(range(len(self.WAVEFORMS))) + tuple(range(101,161)):
+                self.dds.write(self.dds.WAVEFORM + self.num, int(value))
+            else:
+                raise ValueError("Channel.wave can only be set to a known waveform `str` or its index `int`")
         except:
-            self.dds.write(self.dds.WAVEFORM + self.num, int(value))
+            raise ValueError("Channel.wave can only be set to a known waveform `str` or its index `int`")
 
     @property
     def freq(self):
