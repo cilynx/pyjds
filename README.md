@@ -26,6 +26,25 @@ jds.phase = 10 # Deg
 chan1.enabled = True
 chan2.enabled = True
 ```
+# channel.enabled
+Channel output.  Can be set by `bool` (`True`/`False`) or `int` (`1`/`0`).  Returns `bool` state.
+```python
+# Enable channel output
+channel.enabled = True
+# or
+channel.enabled = 1
+
+# Disable channel output
+channel.enabled = False
+# or
+channel.enabled = 0
+
+# Print the current output state (`bool`)
+print(channel.enabled)
+
+# Valid values are:
+(True, False, 1, 0)
+```
 
 # jds.model
 The device model number...ish.  Generally aligns with the maximum frequency.  Read-only.

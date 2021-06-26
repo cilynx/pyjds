@@ -5,11 +5,31 @@ class ChannelsTest(TestCase):
     jds = pyjds.JDS()
 
     def test_enabled(self):
-        for e in (True, False):
+        for e in (True, 1, '1', "1"):
             with self.subTest(e=e):
                 for channel in self.jds.channels:
+                    other_index = not channel.num
+                    other_channel = self.jds.channels[other_index]
+                    other_before = other_channel.enabled
                     channel.enabled = e
-                    self.assertEqual(channel.enabled, e)
+                    self.assertEqual(channel.enabled, True)
+                    self.assertEqual(other_channel.enabled, other_before)
+        for e in (False, 0, '0', "0"):
+            with self.subTest(e=e):
+                for channel in self.jds.channels:
+                    other_index = not channel.num
+                    other_channel = self.jds.channels[other_index]
+                    other_before = other_channel.enabled
+                    channel.enabled = e
+                    self.assertEqual(channel.enabled, False)
+                    self.assertEqual(other_channel.enabled, other_before)
+
+    def test_enabled_invalid(self):
+        for e in (None, "", '', 'a', "foo", -1, 13):
+            with self.subTest(e=e):
+                with self.assertRaises(ValueError):
+                    for channel in self.jds.channels:
+                        channel.enabled = e
 
     def test_frequency(self):
         for f in (0.01, 0.1, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 0):

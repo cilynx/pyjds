@@ -28,10 +28,12 @@ class Channel:
 
     @enabled.setter
     def enabled(self, value):
+        if value not in (False,True,'0','1'):
+            raise ValueError("Enable state can only be set to bool (True/False) or int (0/1)")
         param = [0,0]
         param[self.num] = int(value)
-        other_channel = self.dds.channels[int(not self.num)]
-        param[int(not self.num)] = int(other_channel.enabled)
+        other_channel = self.dds.channels[not self.num]
+        param[not self.num] = int(other_channel.enabled)
         self.dds.write(self.dds.CHANNEL_ENABLE, param)
 
     @property
