@@ -117,8 +117,13 @@ class JDS:
                 "MOD_SF1", "MOD_SF1_START", "MOD_SF1_END", "MOD_SF1_TIME", "MOD_SF1_DIR", "MOD_SF1_MODE", "MOD_SF1_CTRL", None,
                 "MOD_SF2", "MOD_SF2_START", "MOD_SF2_END", "MOD_SF2_TIME", "MOD_SF2_DIR", "MOD_SF2_MODE", "MOD_SF2_CTRL", None,
                 "MOD_PLS", "MOD_PLS_W", "MOD_PLS_T", "MOD_PLS_OFFS", "MOD_PLS_AMPL", "MOD_PLS_CTRL", None, None,
-                "MOD_BST", "MOD_BST_NUM", "MOD_BST_MODE", "MOD_BST_CTRL", None, None # Higher values than this corrupt the display
+                "MOD_BST", "MOD_BST_NUM", "MOD_BST_MODE", "MOD_BST_CTRL", None, None, None, None
+                # Values from 112 to 255 cause random display corruption
                 )
+
+    # From 112 to 255, the PANEL register does not update based on the SELECT register setting.
+    # 256 wraps back around setting both SELECT and PANEL to 0 will all values above acting as $x - 256
+    # 512 wraps back around setting both SELECT and PANEL to 0 with all values above acting as $x - 512
 
     # When you write to the PANEL register, the value you get back on read isn't the one you wrote.  For whatever reason
     # the device expects you to write a 0-9 to specify the panel as in PANELS_W which doesn't really mean anything.  The
@@ -126,7 +131,7 @@ class JDS:
     # in the comments on PANELS_R.
 
     # I haven't come up with a good way to derive one from the other as the first four panels have 16 selection slots and
-    # the remaineder have only 8.  
+    # the remainder have only 8.
 
     PANELS_W = ("Channel 1 Main",   # 0
                 "Channel 2 Main",   # 16
