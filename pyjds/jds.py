@@ -120,31 +120,39 @@ class JDS:
                 "MOD_BST", "MOD_BST_NUM", "MOD_BST_MODE", "MOD_BST_CTRL", None, None # Higher values than this corrupt the display
                 )
 
-    PANELS_W = ("Channel 1 Main",
-                "Channel 2 Main",
-                "System Settings",
-                None,
-                "Measurement",
-                "Counter",
-                "Channel 1 Sweep",
-                "Channel 2 Sweep",
-                "Pulse",
-                "Burst")
+    # When you write to the PANEL register, the value you get back on read isn't the one you wrote.  For whatever reason
+    # the device expects you to write a 0-9 to specify the panel as in PANELS_W which doesn't really mean anything.  The
+    # value that then shows up in the register is the address that aligns with the first SELECTion in that panel as described
+    # in the comments on PANELS_R.
 
-    PANELS_R = ("Channel 1 Main",
-                "PANEL_1",
-                "Channel 2 Main",
-                "PANEL_3",
-                "System Settings",
-                "PANEL_5",
-                "PANEL_6",
-                "PANEL_7",
-                "Measurement",
-                "Counter",
-                "Channel 1 Sweep",
-                "Channel 2 Sweep",
-                "Pulse",
-                "Burst")
+    # I haven't come up with a good way to derive one from the other as the first four panels have 16 selection slots and
+    # the remaineder have only 8.  
+
+    PANELS_W = ("Channel 1 Main",   # 0
+                "Channel 2 Main",   # 16
+                "System Settings",  # 32
+                "Calibration",      # 48    Cannot set this one with the PANEL register.  Have to SELECT a child instead.
+                "Measurement",      # 64
+                "Counter",          # 72
+                "Channel 1 Sweep",  # 80
+                "Channel 2 Sweep",  # 88
+                "Pulse",            # 96
+                "Burst")            # 104
+
+    PANELS_R = ("Channel 1 Main",   # 0     Aligns with CH1_CH1
+                None,               # 8     Not used because there are 16 selections in the Channel 1 panel
+                "Channel 2 Main",   # 16    Aligns with CH2_CH1
+                None,               # 24    Not used because there are 16 selections in the Channel 2 panel
+                "System Settings",  # 32    Aligns with SYS_SAVE_LOAD
+                None,               # 40    Not used because there are 16 selections in the System panel (including padding)
+                "Calibration",      # 48    Aligns with CAL_FREQ
+                None,               # 56    Not used because there are 16 selections in the Calibration panel
+                "Measurement",      # 64    Aligns with MEASURE_MEASURE
+                "Counter",          # 72    Aligns with MEASURE_COUNTER
+                "Channel 1 Sweep",  # 80    Aligns with MOD_SF1
+                "Channel 2 Sweep",  # 88    Aligns with MOD_SF2
+                "Pulse",            # 96    Aligns with MOD_PLS
+                "Burst")            # 104   Aligns with MOD_BST
 
     def __init__(self, port="/dev/ttyUSB0"):
         self.channels = list()
